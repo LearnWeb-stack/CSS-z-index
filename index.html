@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -777,46 +778,455 @@
             </div>
         </div>
 
-        <!-- Quick Reference -->
+        <!-- Advanced Techniques -->
         <div class="section">
-            <h2>📚 Quick Reference</h2>
+            <h2>🚀 Advanced Z-Index Techniques</h2>
+            
+            <h3>CSS Grid and Z-Index</h3>
+            <p>Grid items can use z-index to layer on top of each other within the same grid cell.</p>
             
             <div class="code-block">
-/* Z-Index Quick Reference */
+.grid-container {
+    display: grid;
+    grid-template-areas: "content content";
+}
 
-/* Basic usage (requires positioning) */
-.element {
-    position: relative;  /* or absolute, fixed, sticky */
+.grid-item-1 {
+    grid-area: content;
+    z-index: 1;
+    background: rgba(255, 0, 0, 0.7);
+}
+
+.grid-item-2 {
+    grid-area: content;  /* Same area! */
+    z-index: 2;
+    background: rgba(0, 0, 255, 0.7);
+}</div>
+
+            <h3>Backdrop Filter with Z-Index</h3>
+            <p>Modern backdrop-filter creates stacking contexts and works great with z-index for glassmorphism effects.</p>
+            
+            <div class="code-block">
+.glass-effect {
+    position: fixed;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}</div>
+
+            <h3>CSS Containment and Z-Index</h3>
+            <p>The contain property can affect stacking contexts and performance.</p>
+            
+            <div class="code-block">
+.contained-section {
+    contain: layout style paint;
+    /* Creates isolated rendering context */
+    position: relative;
+    z-index: 1;
+}</div>
+        </div>
+
+        <!-- Real-World Examples -->
+        <div class="section">
+            <h2>🌍 Real-World Z-Index Examples</h2>
+            
+            <h3>Complete Modal System</h3>
+            <div class="code-block">
+/* Modal System Z-Index Structure */
+:root {
+    --z-modal-backdrop: 1000;
+    --z-modal-content: 1001;
+    --z-modal-close: 1002;
+    --z-tooltip-over-modal: 1100;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: var(--z-modal-backdrop);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 8px;
+    z-index: var(--z-modal-content);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: var(--z-modal-close);
+}</div>
+
+            <h3>Dropdown Menu with Submenus</h3>
+            <div class="code-block">
+.navbar {
+    position: relative;
     z-index: 10;
 }
 
-/* Negative z-index (behind content) */
-.background {
+.dropdown {
     position: absolute;
+    z-index: 20;    /* Above navbar */
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-submenu {
+    position: absolute;
+    z-index: 21;    /* Above parent dropdown */
+    left: 100%;
+    top: 0;
+}</div>
+
+            <h3>Floating Action Button (FAB)</h3>
+            <div class="code-block">
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 500;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #2196F3;
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+    transition: all 0.3s ease;
+}
+
+.fab:hover {
+    transform: scale(1.1);
+    z-index: 501;  /* Slightly higher on hover */
+}</div>
+
+            <h3>Sticky Header with Dropdown</h3>
+            <div class="code-block">
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border-bottom: 1px solid #eee;
+}
+
+.header-dropdown {
+    position: absolute;
+    z-index: 101;  /* Just above sticky header */
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+}</div>
+        </div>
+
+        <!-- Performance Considerations -->
+        <div class="section">
+            <h2>⚡ Performance & Browser Considerations</h2>
+            
+            <h3>Performance Impact</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Composite Layers:</strong> High z-index elements may create new composite layers</li>
+                <li><strong>Repainting:</strong> Changing z-index can trigger repaints</li>
+                <li><strong>Memory Usage:</strong> Each stacking context uses additional memory</li>
+                <li><strong>GPU Acceleration:</strong> Some z-index configurations trigger GPU rendering</li>
+            </ul>
+
+            <h3>Browser Differences</h3>
+            <div class="code-block">
+/* Safari has different stacking behavior with transforms */
+.safari-fix {
+    -webkit-transform: translateZ(0);  /* Force hardware acceleration */
+    transform: translateZ(0);
+}
+
+/* IE11 stacking context issues */
+.ie-fix {
+    position: relative;  /* Explicit positioning for IE */
+}</div>
+
+            <h3>Mobile Considerations</h3>
+            <div class="code-block">
+/* Mobile-specific z-index adjustments */
+@media (max-width: 768px) {
+    .mobile-menu {
+        z-index: 9999;  /* Ensure above mobile browser UI */
+    }
+    
+    .mobile-modal {
+        z-index: 10000;
+        /* Account for mobile keyboard overlay */
+    }
+}</div>
+
+            <div class="warning">
+                <strong>⚠️ Performance Tip:</strong> Avoid excessive z-index values (999999) as they can impact performance and create maintenance issues.
+            </div>
+        </div>
+
+        <!-- Debugging Tools -->
+        <div class="section">
+            <h2>🔍 Debugging Z-Index Issues</h2>
+            
+            <h3>Browser DevTools Techniques</h3>
+            <div class="code-block">
+/* Temporary debugging styles */
+.debug-stacking * {
+    outline: 1px solid red !important;
+    background: rgba(255, 0, 0, 0.1) !important;
+}
+
+/* Show z-index values */
+.debug-z-index::before {
+    content: "z: " attr(style);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: yellow;
+    font-size: 10px;
+    padding: 2px;
+}</div>
+
+            <h3>JavaScript Z-Index Inspector</h3>
+            <div class="code-block">
+// Quick z-index inspector for debugging
+function inspectZIndex() {
+    document.querySelectorAll('*').forEach(el => {
+        const zIndex = window.getComputedStyle(el).zIndex;
+        if (zIndex !== 'auto') {
+            console.log(el, 'z-index:', zIndex);
+            el.title = `z-index: ${zIndex}`;
+        }
+    });
+}
+
+// Call in browser console: inspectZIndex();</div>
+
+            <h3>Common Debug Checklist</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>✅ Is the element positioned (not static)?</li>
+                <li>✅ Are you fighting a stacking context?</li>
+                <li>✅ Check for transform, opacity, or filter creating contexts</li>
+                <li>✅ Verify parent-child stacking relationships</li>
+                <li>✅ Test in different browsers</li>
+                <li>✅ Check for CSS specificity issues</li>
+            </ul>
+        </div>
+
+        <!-- Accessibility -->
+        <div class="section">
+            <h2>♿ Accessibility and Z-Index</h2>
+            
+            <h3>Focus Management</h3>
+            <p>Ensure proper focus order isn't disrupted by z-index layering.</p>
+            
+            <div class="code-block">
+/* Ensure modals trap focus properly */
+.modal {
+    z-index: 1000;
+}
+
+.modal[aria-hidden="true"] {
+    z-index: -1;  /* Hide behind content when closed */
+    visibility: hidden;
+}
+
+/* Focus indicator should be visible above all layers */
+:focus {
+    outline: 2px solid #005fcc;
+    outline-offset: 2px;
+    z-index: 9999;  /* Above everything for visibility */
+}</div>
+
+            <h3>Screen Reader Considerations</h3>
+            <div class="code-block">
+/* Ensure screen readers respect visual layering */
+.visually-behind {
     z-index: -1;
+    aria-hidden: true;  /* Hide from screen readers too */
 }
 
-/* Creating stacking context */
-.context-creator {
+.modal-backdrop {
+    z-index: 1000;
+    aria-hidden: true;  /* Backdrop is decorative */
+}</div>
+
+            <div class="info">
+                <strong>♿ Accessibility Note:</strong> Visual layering should match logical reading order. High z-index elements that appear "on top" should also be logically "on top" in the DOM or tab order.
+            </div>
+        </div>
+
+        <!-- CSS Architecture -->
+        <div class="section">
+            <h2>🏗️ Z-Index Architecture Patterns</h2>
+            
+            <h3>Component-Based Z-Index</h3>
+            <div class="code-block">
+/* Component-scoped z-index variables */
+.card-component {
+    --card-base: 1;
+    --card-header: 2;
+    --card-tooltip: 3;
+}
+
+.card {
     position: relative;
-    z-index: 1;         /* Creates context */
-    /* OR */
-    opacity: 0.99;      /* Creates context */
-    /* OR */
-    transform: scale(1); /* Creates context */
-    /* OR */
-    isolation: isolate;  /* Creates context cleanly */
+    z-index: var(--card-base);
 }
 
-/* Common z-index scale */
-/* Background: -1 to 0 */
-/* Content: 1 to 9 */
-/* UI Elements: 10 to 99 */
+.card__header {
+    position: relative;
+    z-index: var(--card-header);
+}
+
+.card__tooltip {
+    position: absolute;
+    z-index: var(--card-tooltip);
+}</div>
+
+            <h3>Global Z-Index System</h3>
+            <div class="code-block">
+/* Centralized z-index management */
+:root {
+    /* Base layers */
+    --z-background: -1;
+    --z-default: 0;
+    --z-content: 1;
+    
+    /* Interface layers */
+    --z-header: 10;
+    --z-navigation: 20;
+    --z-sidebar: 30;
+    
+    /* Interactive layers */
+    --z-dropdown: 100;
+    --z-tooltip: 200;
+    --z-overlay: 300;
+    
+    /* Modal layers */
+    --z-modal-backdrop: 1000;
+    --z-modal-content: 1010;
+    --z-modal-controls: 1020;
+    
+    /* System layers */
+    --z-notification: 2000;
+    --z-emergency: 9999;
+}
+
+/* Usage throughout codebase */
+.site-header {
+    z-index: var(--z-header);
+}
+
+.tooltip {
+    z-index: var(--z-tooltip);
+}</div>
+
+            <h3>BEM with Z-Index</h3>
+            <div class="code-block">
+/* BEM methodology for z-index organization */
+.popup {
+    --popup-z-base: 100;
+    z-index: var(--popup-z-base);
+}
+
+.popup__backdrop {
+    z-index: calc(var(--popup-z-base) - 1);
+}
+
+.popup__content {
+    z-index: var(--popup-z-base);
+}
+
+.popup__close {
+    z-index: calc(var(--popup-z-base) + 1);
+}</div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="section">
+            <h2>📚 Complete Quick Reference</h2>
+            
+            <div class="code-block">
+/* Z-Index Complete Reference */
+
+/* BASIC USAGE */
+.positioned-element {
+    position: relative;  /* Required: relative, absolute, fixed, sticky */
+    z-index: 10;        /* Integer value */
+}
+
+/* STACKING CONTEXT CREATORS */
+.creates-context {
+    /* Method 1: Position + z-index */
+    position: relative;
+    z-index: 1;
+    
+    /* Method 2: Opacity */
+    opacity: 0.99;
+    
+    /* Method 3: Transform */
+    transform: translateZ(0);
+    
+    /* Method 4: Filter */
+    filter: blur(0);
+    
+    /* Method 5: Isolation (cleanest) */
+    isolation: isolate;
+    
+    /* Method 6: Flex/Grid children */
+    /* Parent: display: flex/grid */
+    z-index: 1;
+}
+
+/* RECOMMENDED Z-INDEX SCALE */
+/* Backgrounds: -10 to -1 */
+/* Content: 0 to 9 */
+/* UI Components: 10 to 99 */
 /* Overlays: 100 to 999 */
-/* Modals: 1000+ */</div>
+/* Modals: 1000 to 9999 */
+/* Emergency: 10000+ */
+
+/* COMMON PATTERNS */
+.modal-system {
+    --backdrop: 1000;
+    --content: 1001;
+    --controls: 1002;
+}
+
+/* DEBUGGING */
+.debug-all-z-index * {
+    position: relative !important;
+    outline: 1px solid red !important;
+}
+
+/* ACCESSIBILITY */
+.focus-visible {
+    z-index: 9999;  /* Always visible */
+    outline: 2px solid #005fcc;
+}</div>
+
+            <h3>🎯 Golden Rules</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Positioning Required:</strong> Z-index only works on positioned elements</li>
+                <li><strong>Context Isolation:</strong> Children can't escape parent's stacking context</li>
+                <li><strong>Use a Scale:</strong> Consistent numbering system prevents conflicts</li>
+                <li><strong>Document Everything:</strong> Comment your z-index decisions</li>
+                <li><strong>Test Thoroughly:</strong> Different browsers handle edge cases differently</li>
+            </ul>
 
             <div class="highlight">
-                <strong>🎉 Remember:</strong> Z-index is about layering, not just numbers. Understanding stacking contexts is the key to mastering element layering in CSS!
+                <strong>🎉 Mastery Achieved!</strong> You now understand z-index, stacking contexts, and all related properties. Remember: it's not just about the numbers—it's about understanding how browsers layer elements in 3D space!
             </div>
         </div>
     </div>

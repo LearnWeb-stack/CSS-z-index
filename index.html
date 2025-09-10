@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Z-Index & Stacking Context Tutorial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            border-left: 4px solid #667eea;
+        }
+
+        .demo-container {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            position: relative;
+            min-height: 200px;
+            overflow: hidden;
+        }
+
+        .demo-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.3);
+            position: absolute;
+        }
+
+        /* Basic Z-Index Demo */
+        .basic-demo .box1 {
+            background: #e74c3c;
+            top: 20px;
+            left: 20px;
+            z-index: 1;
+        }
+        .basic-demo .box2 {
+            background: #3498db;
+            top: 60px;
+            left: 60px;
+            z-index: 3;
+        }
+        .basic-demo .box3 {
+            background: #2ecc71;
+            top: 100px;
+            left: 100px;
+            z-index: 2;
+        }
+
+        /* Negative Z-Index Demo */
+        .negative-demo {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            font-weight: bold;
+            padding: 40px;
+        }
+        .negative-demo .behind-box {
+            background: rgba(0,0,0,0.7);
+            top: 30px;
+            left: 30px;
+            z-index: -1;
+        }
+        .negative-demo .front-box {
+            background: #4834d4;
+            top: 70px;
+            left: 70px;
+            z-index: 1;
+        }
+
+        /* Stacking Context Demo */
+        .stacking-demo .parent1 {
+            position: relative;
+            background: rgba(231, 76, 60, 0.3);
+            width: 200px;
+            height: 150px;
+            top: 20px;
+            left: 20px;
+            z-index: 1;
+            border: 2px dashed #e74c3c;
+        }
+        .stacking-demo .parent2 {
+            position: relative;
+            background: rgba(52, 152, 219, 0.3);
+            width: 200px;
+            height: 150px;
+            top: -50px;
+            left: 100px;
+            z-index: 2;
+            border: 2px dashed #3498db;
+        }
+        .stacking-demo .child1 {
+            background: #e74c3c;
+            width: 80px;
+            height: 80px;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+        }
+        .stacking-demo .child2 {
+            background: #3498db;
+            width: 80px;
+            height: 80px;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+        }
+
+        /* Interactive Demo */
+        .interactive-demo {
+            height: 300px;
+        }
+        .interactive-demo .layer {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255,255,255,0.5);
+        }
+        .interactive-demo .layer:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .interactive-demo .layer1 {
+            background: #ff6b6b;
+            top: 20px;
+            left: 20px;
+            z-index: 1;
+        }
+        .interactive-demo .layer2 {
+            background: #4ecdc4;
+            top: 60px;
+            left: 80px;
+            z-index: 2;
+        }
+        .interactive-demo .layer3 {
+            background: #45b7d1;
+            top: 100px;
+            left: 140px;
+            z-index: 3;
+        }
+        .interactive-demo .layer4 {
+            background: #f9ca24;
+            top: 140px;
+            left: 200px;
+            z-index: 4;
+        }
+
+        /* Transform Demo */
+        .transform-demo .box-transform {
+            background: #9b59b6;
+            top: 50px;
+            left: 50px;
+            transform: rotate(15deg) scale(1.2);
+            z-index: 2;
+        }
+        .transform-demo .box-normal {
+            background: #e67e22;
+            top: 80px;
+            left: 80px;
+            z-index: 1;
+        }
+
+        /* Opacity Demo */
+        .opacity-demo .box-opaque {
+            background: #2c3e50;
+            top: 30px;
+            left: 30px;
+            z-index: 1;
+        }
+        .opacity-demo .box-transparent {
+            background: #e74c3c;
+            top: 60px;
+            left: 60px;
+            opacity: 0.7;
+            z-index: 2;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        .info {
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .property-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .property-table th,
+        .property-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .property-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .property-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .controls {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .visual-stack {
+            perspective: 1000px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stack-layer {
+            position: absolute;
+            width: 150px;
+            height: 100px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .stack-layer:nth-child(1) {
+            background: #e74c3c;
+            transform: translateZ(0px);
+            z-index: 1;
+        }
+        .stack-layer:nth-child(2) {
+            background: #f39c12;
+            transform: translateZ(20px);
+            z-index: 2;
+        }
+        .stack-layer:nth-child(3) {
+            background: #2ecc71;
+            transform: translateZ(40px);
+            z-index: 3;
+        }
+        .stack-layer:nth-child(4) {
+            background: #3498db;
+            transform: translateZ(60px);
+            z-index: 4;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .demo-container {
+                padding: 15px;
+                min-height: 250px;
+            }
+            
+            .demo-box {
+                width: 80px;
+                height: 80px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CSS Z-Index & Stacking</h1>
+            <p>Master element layering and stacking contexts</p>
+        </div>
+
+        <!-- Introduction -->
+        <div class="section">
+            <h2>🎭 Introduction to Z-Index</h2>
+            <p>The <strong>z-index</strong> property controls the stacking order of positioned elements. Think of it as controlling which elements appear in front of or behind others, like layers in a drawing application.</p>
+            
+            <h3>Key Concepts</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Stacking Order:</strong> The visual layering of elements on the z-axis</li>
+                <li><strong>Stacking Context:</strong> A 3D conceptualization of HTML elements</li>
+                <li><strong>Z-Index Values:</strong> Integers that determine layer priority</li>
+                <li><strong>Positioned Elements:</strong> Only positioned elements can use z-index</li>
+            </ul>
+
+            <div class="visual-stack">
+                <div class="stack-layer">Layer 1 (z: 1)</div>
+                <div class="stack-layer">Layer 2 (z: 2)</div>
+                <div class="stack-layer">Layer 3 (z: 3)</div>
+                <div class="stack-layer">Layer 4 (z: 4)</div>
+            </div>
+
+            <div class="info">
+                <strong>📍 Important:</strong> Z-index only works on positioned elements (position: relative, absolute, fixed, or sticky). Static elements ignore z-index values.
+            </div>
+        </div>
+
+        <!-- Basic Z-Index -->
+        <div class="section">
+            <h2>🔢 Basic Z-Index Values</h2>
+            <p>Z-index accepts integer values (positive, negative, or zero). Higher values appear in front of lower values.</p>
+            
+            <div class="code-block">
+.element-behind {
+    position: relative;
+    z-index: 1;     /* Behind */
+}
+
+.element-middle {
+    position: relative;
+    z-index: 2;     /* Middle */
+}
+
+.element-front {
+    position: relative;
+    z-index: 3;     /* Front */
+}</div>
+
+            <h3>Live Demo - Basic Z-Index Ordering:</h3>
+            <div class="demo-container basic-demo">
+                <div class="demo-box box1">Red<br>z-index: 1</div>
+                <div class="demo-box box2">Blue<br>z-index: 3</div>
+                <div class="demo-box box3">Green<br>z-index: 2</div>
+            </div>
+
+            <p><em>Notice how the blue box (z-index: 3) appears in front, even though it comes before the green box in the HTML.</em></p>
+
+            <h3>Z-Index Values Reference:</h3>
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>Value</th>
+                        <th>Description</th>
+                        <th>Example Use</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>auto</strong></td>
+                        <td>Default value, same as parent</td>
+                        <td>Normal document flow</td>
+                    </tr>
+                    <tr>
+                        <td><strong>0</strong></td>
+                        <td>Same level as default</td>
+                        <td>Baseline layer</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Positive integers</strong></td>
+                        <td>Higher values = front layers</td>
+                        <td>Modals (999), Tooltips (100)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Negative integers</strong></td>
+                        <td>Behind default layer</td>
+                        <td>Background elements (-1)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Negative Z-Index -->
+        <div class="section">
+            <h2>⬇️ Negative Z-Index</h2>
+            <p>Negative z-index values place elements behind the default stacking layer, useful for background effects.</p>
+            
+            <div class="code-block">
+.background-element {
+    position: absolute;
+    z-index: -1;    /* Behind normal content */
+    background: rgba(0,0,0,0.7);
+}
+
+.normal-content {
+    position: relative;
+    z-index: 1;     /* In front of background */
+}</div>
+
+            <h3>Live Demo - Negative Z-Index:</h3>
+            <div class="demo-container negative-demo">
+                <p style="position: relative; z-index: 0;">This text has z-index: 0</p>
+                <div class="demo-box behind-box">Behind<br>z-index: -1</div>
+                <div class="demo-box front-box">Front<br>z-index: 1</div>
+            </div>
+
+            <div class="highlight">
+                <strong>💡 Use Case:</strong> Negative z-index is perfect for decorative backgrounds, watermarks, or elements that should never interfere with interactive content.
+            </div>
+        </div>
+
+        <!-- Stacking Context -->
+        <div class="section">
+            <h2>🏗️ Understanding Stacking Contexts</h2>
+            <p>A <strong>stacking context</strong> is a three-dimensional conceptualization of HTML elements. Elements within the same stacking context are layered according to their z-index values.</p>
+            
+            <div class="code-block">
+/* Parent creates stacking context */
+.parent {
+    position: relative;
+    z-index: 1;
+}
+
+/* Child z-index is relative to parent's context */
+.child {
+    position: absolute;
+    z-index: 999; /* Only competes with siblings */
+}</div>
+
+            <h3>What Creates a Stacking Context:</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Root element (html)</li>
+                <li>Elements with position and z-index other than auto</li>
+                <li>Elements with opacity less than 1</li>
+                <li>Elements with transform, filter, or backdrop-filter</li>
+                <li>Elements with mix-blend-mode other than normal</li>
+                <li>Flex/Grid items with z-index other than auto</li>
+                <li>Elements with isolation: isolate</li>
+            </ul>
+
+            <h3>Live Demo - Stacking Context Isolation:</h3>
+            <div class="demo-container stacking-demo">
+                <div class="parent1">
+                    Parent 1 (z-index: 1)
+                    <div class="demo-box child1">Child<br>z-index: 100</div>
+                </div>
+                <div class="parent2">
+                    Parent 2 (z-index: 2)
+                    <div class="demo-box child2">Child<br>z-index: 1</div>
+                </div>
+            </div>
+
+            <p><em>The red child has z-index: 100, but still appears behind the blue child (z-index: 1) because its parent has a lower z-index!</em></p>
+
+            <div class="warning">
+                <strong>⚠️ Critical Rule:</strong> Child elements can never appear above their parent's stacking context, regardless of their z-index value.
+            </div>
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="section">
+            <h2>🎮 Interactive Z-Index Demo</h2>
+            <p>Click on any layer to bring it to the front and see z-index in action!</p>
+            
+            <div class="demo-container interactive-demo" id="interactiveDemo">
+                <div class="layer layer1" onclick="bringToFront(this)">Layer 1<br>Click me!</div>
+                <div class="layer layer2" onclick="bringToFront(this)">Layer 2<br>Click me!</div>
+                <div class="layer layer3" onclick="bringToFront(this)">Layer 3<br>Click me!</div>
+                <div class="layer layer4" onclick="bringToFront(this)">Layer 4<br>Click me!</div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="resetLayers()">Reset Layers</button>
+                <button class="btn" onclick="randomizeOrder()">Randomize Order</button>
+            </div>
+
+            <div class="highlight">
+                <strong>🎯 Try This:</strong> Click different layers and observe how the z-index values change. Notice how higher values always win!
+            </div>
+        </div>
+
+        <!-- Related Properties -->
+        <div class="section">
+            <h2>🔗 Related Properties</h2>
+            
+            <h3>Transform and Z-Index</h3>
+            <p>Elements with CSS transforms create new stacking contexts, which can affect z-index behavior.</p>
+            
+            <div class="code-block">
+.transformed-element {
+    transform: rotate(45deg);  /* Creates stacking context */
+    z-index: 1;
+}</div>
+
+            <div class="demo-container transform-demo">
+                <div class="demo-box box-normal">Normal<br>z-index: 1</div>
+                <div class="demo-box box-transform">Transformed<br>z-index: 2</div>
+            </div>
+
+            <h3>Opacity and Stacking</h3>
+            <p>Elements with opacity less than 1 create stacking contexts.</p>
+            
+            <div class="code-block">
+.semi-transparent {
+    opacity: 0.7;    /* Creates stacking context */
+    z-index: 2;
+}</div>
+
+            <div class="demo-container opacity-demo">
+                <div class="demo-box box-opaque">Opaque<br>z-index: 1</div>
+                <div class="demo-box box-transparent">Transparent<br>z-index: 2</div>
+            </div>
+
+            <h3>Isolation Property</h3>
+            <p>The <code>isolation</code> property can create stacking contexts without side effects.</p>
+            
+            <div class="code-block">
+.isolated {
+    isolation: isolate;  /* Creates clean stacking context */
+}</div>
+
+            <table class="property-table">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Values</th>
+                        <th>Creates Stacking Context</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>z-index</strong></td>
+                        <td>auto | integer</td>
+                        <td>When not auto (with positioning)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>opacity</strong></td>
+                        <td>0.0 - 1.0</td>
+                        <td>When less than 1</td>
+                    </tr>
+                    <tr>
+                        <td><strong>transform</strong></td>
+                        <td>Any value except none</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>filter</strong></td>
+                        <td>Any value except none</td>
+                        <td>Yes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>isolation</strong></td>
+                        <td>auto | isolate</td>
+                        <td>When isolate</td>
+                    </tr>
+                    <tr>
+                        <td><strong>mix-blend-mode</strong></td>
+                        <td>Any value except normal</td>
+                        <td>Yes</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Common Patterns -->
+        <div class="section">
+            <h2>🎨 Common Z-Index Patterns</h2>
+            
+            <h3>Modal and Overlay System</h3>
+            <div class="code-block">
+/* Common z-index scale for web applications */
+.page-content {
+    z-index: 1;
+}
+
+.dropdown-menu {
+    z-index: 100;
+}
+
+.sticky-header {
+    z-index: 200;
+}
+
+.modal-backdrop {
+    z-index: 1000;
+}
+
+.modal-content {
+    z-index: 1001;
+}
+
+.tooltip {
+    z-index: 1100;
+}
+
+.notification {
+    z-index: 1200;
+}</div>
+
+            <h3>CSS Custom Properties for Z-Index</h3>
+            <div class="code-block">
+:root {
+    --z-behind: -1;
+    --z-default: 0;
+    --z-content: 1;
+    --z-header: 10;
+    --z-dropdown: 100;
+    --z-modal: 1000;
+    --z-tooltip: 1100;
+}
+
+.modal {
+    z-index: var(--z-modal);
+}</div>
+
+            <h3>Flexbox and Grid Z-Index</h3>
+            <div class="code-block">
+.flex-container {
+    display: flex;
+}
+
+.flex-item {
+    z-index: 1;  /* Works on flex items */
+}
+
+.grid-container {
+    display: grid;
+}
+
+.grid-item {
+    z-index: 2;  /* Works on grid items */
+}</div>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="section">
+            <h2>✨ Best Practices</h2>
+            
+            <h3>🎯 Z-Index Management Tips:</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Use a scale:</strong> Stick to multiples of 10 or 100 for easy insertion</li>
+                <li><strong>Document your system:</strong> Create a z-index reference guide</li>
+                <li><strong>Start small:</strong> Don't jump to 9999 immediately</li>
+                <li><strong>Group by function:</strong> Keep related elements in similar ranges</li>
+                <li><strong>Use CSS variables:</strong> Centralize z-index values</li>
+            </ul>
+
+            <h3>⚠️ Common Pitfalls:</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Forgetting that z-index only works on positioned elements</li>
+                <li>Not understanding stacking context isolation</li>
+                <li>Using extremely high values (999999) unnecessarily</li>
+                <li>Fighting stacking contexts instead of working with them</li>
+                <li>Not testing across different browsers and devices</li>
+            </ul>
+
+            <h3>🔧 Debugging Z-Index Issues:</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>Use browser dev tools to inspect stacking contexts</li>
+                <li>Add temporary background colors to see layer boundaries</li>
+                <li>Check for unintended stacking context creation</li>
+                <li>Verify element positioning (static elements ignore z-index)</li>
+                <li>Test with CSS transforms and opacity effects</li>
+            </ul>
+
+            <div class="info">
+                <strong>💡 Pro Tip:</strong> When debugging z-index issues, look for elements that unintentionally create stacking contexts (transforms, opacity, filters, etc.).
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="section">
+            <h2>📚 Quick Reference</h2>
+            
+            <div class="code-block">
+/* Z-Index Quick Reference */
+
+/* Basic usage (requires positioning) */
+.element {
+    position: relative;  /* or absolute, fixed, sticky */
+    z-index: 10;
+}
+
+/* Negative z-index (behind content) */
+.background {
+    position: absolute;
+    z-index: -1;
+}
+
+/* Creating stacking context */
+.context-creator {
+    position: relative;
+    z-index: 1;         /* Creates context */
+    /* OR */
+    opacity: 0.99;      /* Creates context */
+    /* OR */
+    transform: scale(1); /* Creates context */
+    /* OR */
+    isolation: isolate;  /* Creates context cleanly */
+}
+
+/* Common z-index scale */
+/* Background: -1 to 0 */
+/* Content: 1 to 9 */
+/* UI Elements: 10 to 99 */
+/* Overlays: 100 to 999 */
+/* Modals: 1000+ */</div>
+
+            <div class="highlight">
+                <strong>🎉 Remember:</strong> Z-index is about layering, not just numbers. Understanding stacking contexts is the key to mastering element layering in CSS!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMaxZ = 4;
+
+        function bringToFront(element) {
+            currentMaxZ++;
+            element.style.zIndex = currentMaxZ;
+            
+            // Add visual feedback
+            element.style.boxShadow = '0 15px 35px rgba(0,0,0,0.4)';
+            setTimeout(() => {
+                element.style.boxShadow = '0 10px 25px rgba(0,0,0,0.3)';
+            }, 200);
+        }
+
+        function resetLayers() {
+            const layers = document.querySelectorAll('.layer');
+            layers.forEach((layer, index) => {
+                layer.style.zIndex = index + 1;
+            });
+            currentMaxZ = 4;
+        }
+
+        function randomizeOrder() {
+            const layers = document.querySelectorAll('.layer');
+            const zIndexes = [1, 2, 3, 4];
+            
+            // Shuffle array
+            for (let i = zIndexes.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [zIndexes[i], zIndexes[j]] = [zIndexes[j], zIndexes[i]];
+            }
+            
+            layers.forEach((layer, index) => {
+                layer.style.zIndex = zIndexes[index];
+            });
+            
+            currentMaxZ = Math.max(...zIndexes);
+        }
+
+        // Add hover effects to demo boxes
+        document.querySelectorAll('.demo-box').forEach(box => {
+            box.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.transition = 'transform 0.2s ease';
+            });
+            
+            box.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
